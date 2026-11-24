@@ -9,6 +9,28 @@ def init_csv():
             writer = csv.writer(f)
             writer.writerow(["date", "amount", "category", "notes"])
 
-if __name__ == "__main__":
+def add_expenses():
     init_csv()
-    print("CSV initialized.")
+    while True:
+        print("\n--- Add New Expense ---")
+        date = input("Date (YYYY-MM-DD): ").strip()
+        while True:
+            try:
+                amount = float(input("Amount: ").strip())
+                break
+            except ValueError:
+                print("Invalid amount. Please enter a valid number.")
+        category = input("Category (e.g., Food, Transport, Entertainment): ").strip()
+        notes = input("Notes (optional, press Enter to skip): ").strip()
+
+        with open(FILENAME, mode="a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow([date, amount, category, notes])
+
+        print("Expense saved successfully!")
+        cont = input("Add another expense? (y/n): ").strip().lower()
+        if cont != "y":
+            break
+
+if __name__ == "__main__":
+    add_expenses()
