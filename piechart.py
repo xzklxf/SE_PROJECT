@@ -1,9 +1,11 @@
-"""Visualization module: load saved expenses and summarize them by category."""
+"""Visualization module: load saved expenses and draw a pie chart by category."""
 import csv
 import json
 import os
 import sys
 from collections import defaultdict
+
+import matplotlib.pyplot as plt
 
 DEFAULT_FILE = "expenses.csv"
 
@@ -51,12 +53,23 @@ def summarize_by_category(expenses):
     return dict(sorted(totals.items(), key=lambda kv: kv[1], reverse=True))
 
 
+def draw_pie_chart(totals):
+    """Draw a basic pie chart of category totals."""
+    if not totals:
+        sys.exit("No expenses to plot.")
+    plt.pie(list(totals.values()), labels=list(totals.keys()), autopct="%1.1f%%", startangle=90)
+    plt.title("Expenses by Category")
+    plt.axis("equal")
+    plt.show()
+
+
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_FILE
     totals = summarize_by_category(load_expenses(path))
     print("Category totals:")
     for cat, amt in totals.items():
         print(f"  {cat:<15} {amt:>10,.2f}")
+    draw_pie_chart(totals)
 
 
 if __name__ == "__main__":
