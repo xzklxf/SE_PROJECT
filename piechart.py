@@ -5,6 +5,7 @@ Usage:
     python piechart.py -f data.json          # read a JSON file instead
     python piechart.py -o chart.png          # save to file instead of showing
     python piechart.py --month 2026-11       # only include one month
+    python piechart.py --classic             # full pie instead of donut
 """
 import argparse
 import csv
@@ -81,8 +82,18 @@ def summarize_by_category(expenses, month=None):
     return dict(sorted(totals.items(), key=lambda kv: kv[1], reverse=True))
 
 
-def draw_pie_chart(totals, title="Expenses by Category", output=None):
-    """Draw the pie chart; save to `output` if given, otherwise show a window."""
+# Soft, well-separated colors for the slices.
+PALETTE = [
+    "#4E79A7", "#F28E2B", "#59A14F", "#E15759", "#76B7B2",
+    "#EDC948", "#B07AA1", "#FF9DA7", "#9C755F", "#BAB0AC",
+]
+BG_COLOR = "#FAFAF7"
+TEXT_COLOR = "#2E2E2E"
+MUTED_COLOR = "#7A7A7A"
+
+
+def draw_pie_chart(totals, title="Expenses by Category", output=None, donut=True):
+    """Draw a styled pie (donut) chart; save to `output` or show a window."""
     if not totals:
         sys.exit("No expenses to plot.")
 
@@ -90,34 +101,58 @@ def draw_pie_chart(totals, title="Expenses by Category", output=None):
     labels = list(totals.keys())
     values = list(totals.values())
     grand_total = sum(values)
+    colors = [PALETTE[i % len(PALETTE)] for i in range(len(values))]
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(10, 6.5), facecolor=BG_COLOR)
+    ax.set_facecolor(BG_COLOR)
+    if fig.canvas.manager is not None:
+        fig.canvas.manager.set_window_title("Expense Tracker - Pie Chart")
+
+    width = 0.42 if donut else 1
     wedges, _, autotexts = ax.pie(
         values,
-        autopct=lambda p: f"{p:.1f}%" if p >= 3 else "",
+        colors=colors,
+        autopct=lambda p: f"{p:.1f}%" if p >= 4 else "",
         startangle=90,
         counterclock=False,
-        pctdistance=0.75,
-        wedgeprops={"edgecolor": "white", "linewidth": 1.5},
+        pctdistance=1 - width / 2 if donut else 0.68,
+        explode=[0.04] + [0] * (len(values) - 1),  # pull out the largest slice
+        wedgeprops={"width": width, "edgecolor": BG_COLOR, "linewidth": 2.5},
+        textprops={"fontsize": 11},
     )
     for t in autotexts:
         t.set_color("white")
         t.set_fontweight("bold")
 
-    ax.legend(
-        wedges,
-        [f"{c}  ${v:,.0f}" for c, v in totals.items()],
-        title="Category",
-        loc="center left",
-        bbox_to_anchor=(1, 0.5),
-        frameon=False,
+    if donut:
+        ax.text(0, 0.08, "Total", ha="center", va="center",
+                fontsize=13, color=MUTED_COLOR)
+        ax.text(0, -0.1, f"${grand_total:,.0f}", ha="center", va="center",
+                fontsize=24, fontweight="bold", color=TEXT_COLOR)
+
+    legend_labels = [
+        f"{c}   ${v:,.0f}  ({v / grand_total:.1%})" for c, v in totals.items()
+    ]
+    legend = ax.legend(
+        wedges, legend_labels,
+        title="Category", loc="center left", bbox_to_anchor=(1.02, 0.5),
+        frameon=False, fontsize=11, title_fontsize=12,
+        handlelength=1.2, handleheight=1.2, labelspacing=1.1,
     )
-    ax.set_title(f"{title}\nTotal: ${grand_total:,.0f}", fontsize=14)
+    legend.get_title().set_fontweight("bold")
+    for text in legend.get_texts():
+        text.set_color(TEXT_COLOR)
+
+    subtitle = f"{len(labels)} categories"
+    ax.text(0.5, 1.09, title, transform=ax.transAxes, ha="center",
+            fontsize=18, fontweight="bold", color=TEXT_COLOR)
+    ax.text(0.5, 1.03, subtitle, transform=ax.transAxes, ha="center",
+            fontsize=11, color=MUTED_COLOR)
     ax.axis("equal")
     plt.tight_layout()
 
     if output:
-        plt.savefig(output, dpi=150, bbox_inches="tight")
+        plt.savefig(output, dpi=150, bbox_inches="tight", facecolor=BG_COLOR)
         print(f"Pie chart saved to {output}")
     else:
         plt.show()
@@ -128,6 +163,7 @@ def main():
     parser.add_argument("-f", "--file", default=DEFAULT_FILE, help="CSV or JSON data file")
     parser.add_argument("-o", "--output", help="save chart to this image file instead of showing it")
     parser.add_argument("--month", help="only include expenses in this month, e.g. 2026-11")
+    parser.add_argument("--classic", action="store_true", help="draw a full pie instead of a donut")
     args = parser.parse_args()
 
     expenses = load_expenses(args.file)
@@ -138,7 +174,7 @@ def main():
         print(f"  {cat:<15} {amt:>10,.2f}")
 
     title = f"Expenses by Category ({args.month})" if args.month else "Expenses by Category"
-    draw_pie_chart(totals, title=title, output=args.output)
+    draw_pie_chart(totals, title=title, output=args.output, donut=not args.classic)
 
 
 if __name__ == "__main__":
