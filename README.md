@@ -1,6 +1,6 @@
 # SE_PROJECT - 命令列記帳與視覺化分析工具
 
-本專案為 **軟體工程導論（11513470018）作業一** 的團隊協作實作成果，採用 Python 開發一套模組化的命令列記帳系統，並透過 Git 功能分支（Feature Branch）與命令列合併（Command-line Merge）完成雙人協作開發流程。
+本專案為 **軟體工程導論作業一** 的團隊協作實作成果，採用 Python 開發一套模組化的命令列記帳系統，並透過 Git 功能分支（Feature Branch）與命令列合併（Command-line Merge）完成雙人協作開發流程。
 
 ---
 
@@ -27,16 +27,16 @@ SE_PROJECT/
 
 ##  環境需求與安裝步驟
 
-* **Python 版本**：Python 3.8 以上
-* **相依套件**：`matplotlib`
+Python 版本：Python 3.8 以上
+相依套件：`matplotlib`
 
-1. **複製專案至本地端**：
+1. 複製專案至本地端：
    ```bash
    git clone [https://github.com/xzklxf/SE_PROJECT.git](https://github.com/xzklxf/SE_PROJECT.git)
    cd SE_PROJECT
    ```
 
-2. **安裝繪圖所需套件**：
+2. 安裝繪圖所需套件：
    ```bash
    pip install matplotlib
    ```
@@ -92,4 +92,4 @@ date,amount,category,notes
 
 以下為實際執行系統後所產生的消費類別統計圓餅圖範例：
 
-![Sample Pie Chart](sample_piechart.png)
+![Sample Pie Chart](sample_piechart.gif)
