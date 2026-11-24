@@ -88,12 +88,15 @@ date,amount,category,notes
 
 ---
 
-## 🖼️ 執行結果展示
+##  執行結果展示
 
 以下為實際執行系統後所產生的消費類別統計圓餅圖範例：
-1.開啟圖片的過渡動畫
-![Sample Pie Chart](sample_piechart.gif)
-2.圓餅圖照片
-![Sample Pie Chart](sample_piechcart.png)
-3.指向消費種類動畫
-![Sample Pie Chart](sample_piechcart_pointerversion.png)
+
+### 1. 開啟圖片的過渡動畫
+![開啟圖片的過渡動畫](sample_piechart.gif)
+
+### 2. 圓餅圖照片
+![圓餅圖照片](sample_piechart.png)
+
+### 3. 指向消費種類動畫
+![指向消費種類動畫](sample_piechart_pointerversion.jpg)
